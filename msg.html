@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+<script>
+        const ws = new WebSocket('wss://api-pub.bitfinex.com/ws/2')
+        const msg = JSON.stringify({ 
+            event: 'subscribe', 
+            channel: 'ticker', 
+            symbol: 'tBTCUSD'
+        })
+        
+        //ws.onopen = () => w.send(msg); 
+        let channelId = 0 
+
+        ws.onopen = () => {
+            ws.send(msg)
+            console.log("Conectado ao servidor ws")
+        }
+
+        ws.onmessage = (msg) => {
+            const data = JSON.parse(msg.data)
+            console.log(data)
+            if(data['event'] === 'subscribed') {
+                channelId = data.chanId
+            }else if (data[0] === channelId){
+                console.log("cotacao: ", data[1][6])
+            }
+        }
+</script>
+</body>
+</html>
